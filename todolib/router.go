@@ -21,7 +21,7 @@ func GetVersion(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 // UploadFile ....
 func UploadFile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	r.ParseMultipartForm(0 << 512)
+	r.ParseMultipartForm(0 << 50)
 	file, handler, err := r.FormFile("filename")
 	if err != nil {
 		fmt.Println(err)
