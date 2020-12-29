@@ -2,30 +2,53 @@ package todolib
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type todoData struct {
-	Version    string
-	Name       string
-	UpdateTime int
+	version	version
+	account account
+}
+type version struct {
+	Version	string
+	Name	string
+	UpdateTime	int
+}
+type account struct {
+	UserId			string
+	Password	string
 }
 
 // JSONEnc string to json
-func JSONEnc(version string, name string, updateTime int) string {
-
-	mem := todoData{version, name, updateTime}
-
-	jsonBytes, err := json.Marshal(mem)
+func JSONEnc(arg interface{}) string {
+	jsonBytes, err := json.Marshal(arg)
 	if err != nil {
 		panic(err)
 	}
 	jsonString := string(jsonBytes)
 
+	MakeLog("JSONEnc success")
+
 	return jsonString
 }
 
-// JSONDec json to string
-func JSONDec() {
-	fmt.Println("Decoding...")
+// JSONDecVer json to string
+func JSONDecVer(data []byte) version{
+	var mem version
+	err := json.Unmarshal(data, &mem)
+	if err != nil {
+		panic(err)
+	}
+	MakeLog("JSONDecVer success")
+	return mem
+}
+
+// JSONDecAcct json to string
+func JSONDecAcct(data []byte) account{
+	var mem account
+	err := json.Unmarshal(data, &mem)
+	if err != nil {
+		panic(err)
+	}
+	MakeLog("JSONDecAcct success")
+	return mem
 }
