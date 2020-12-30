@@ -9,7 +9,7 @@ import (
 
 func main() {
 	todolib.MakeLog("Server started...")
-	defer todolib.FpLog.Close()
+	defer todolib.FpLog.Close() //logfile close
 
 	router := httprouter.New()
 
@@ -23,6 +23,8 @@ func main() {
 
 	router.PUT("/upload/:id/:name", todolib.UploadFile)
 	router.DELETE("/delete/db/version", todolib.DeleteVersion)
+
+	router.GET("/files", todolib.DownloadFile)
 
 	err := http.ListenAndServe(":19124", router)
 	if err != nil {
