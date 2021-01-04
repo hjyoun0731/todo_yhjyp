@@ -46,16 +46,18 @@ func InsertVersion(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 
 // UploadFile ....
 func UploadFile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	r.ParseMultipartForm(0 << 50)
+	r.ParseMultipartForm(0 << 100)
 	file, handler, err := r.FormFile("filename")
 	if err != nil {
 		fmt.Println(err)
+
+		fmt.Fprint(w,r.Header)
+		fmt.Fprint(w,r.Body)
+
+		w.Write([]byte("\nFail."))
 		return
 	}
 	defer file.Close()
-	//fmt.Printf("Uploaded File: %+v\n", handler.Filename)
-	//fmt.Printf("File Size: %+v\n", handler.Size)
-	//fmt.Printf("MIME Header: %+v\n", handler.Header)
 
 	upFile, err := os.Create("./files/" + handler.Filename)
 	if err != nil {

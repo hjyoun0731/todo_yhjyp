@@ -6,7 +6,7 @@ import (
 )
 
 // MyLogger for logging
-var myLogger *log.Logger
+var MyLogger *log.Logger
 
 //FpLog logfile
 var FpLog *os.File
@@ -17,12 +17,12 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	myLogger = log.New(FpLog, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+	MyLogger = log.New(FpLog, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
 
 // MakeLog logging func
 func MakeLog(msg string) {
-	myLogger.Print(msg)
+	MyLogger.Print(msg)
 	log.Println(msg)
 }
