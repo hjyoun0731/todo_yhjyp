@@ -5,6 +5,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -49,15 +50,16 @@ func UploadFile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	r.ParseMultipartForm(0 << 100)
 	file, handler, err := r.FormFile("filename")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err) // 실패 시 로그
 
-		fmt.Fprint(w,r.Header)
-		fmt.Fprint(w,r.Body)
-
+		fmt.Fprint(w,r.Header,r.Body) // Request의 Header,Body 그대로 응답
 		w.Write([]byte("\nFail."))
 		return
 	}
 	defer file.Close()
+
+	bodyId,bodyDate := r.FormValue("id"),r.FormValue("date")
+	fmt.Println("id : "+bodyId+" date : "+bodyDate)
 
 	upFile, err := os.Create("./files/" + handler.Filename)
 	if err != nil {
@@ -93,9 +95,7 @@ func DeleteVersion(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 }
 
 func SignUp(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	id := ps.ByName("id")
-	pw := ps.ByName("password")
-	check := ps.ByName("check")
+	id,pw,check := r.FormValue("id"),r.FormValue("password"),r.FormValue("check")
 
 	dup := DbQuery("userid", "account")
 	if dup == id {
@@ -107,11 +107,13 @@ func SignUp(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		mem := account{id, pw}
 		DbAcctInsert(mem)
 		MakeLog("sign up success")
+	} else {
+		MakeLog("Sign up fail. pw1, pw2 is different")
 	}
 }
 
 func SignIn(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	if DbQuery("userid", "account") == ps.ByName("id") && DbQuery("password", "account") == ps.ByName("password") {
+	if DbQuery("userid", "account") == r.FormValue("id") && DbQuery("password", "account") == r.FormValue("password") {
 		fmt.Fprint(w, "SignIn OK")
 		MakeLog("sign in success")
 	} else {

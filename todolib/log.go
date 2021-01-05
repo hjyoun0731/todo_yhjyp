@@ -17,7 +17,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	MyLogger = log.New(FpLog, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+	MyLogger = log.New(FpLog, "INFO: ", log.Ldate|log.Ltime)
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
 

@@ -18,10 +18,10 @@ func main() {
 	router.GET("/get/db/version", todolib.GetVersion)
 
 	router.POST("/post/db/version", todolib.InsertVersion)
-	router.POST("/signup/:id/:password/:check", todolib.SignUp)
-	router.POST("/signin/:id/:password", todolib.SignIn)
+	router.POST("/signup", todolib.SignUp)
+	router.POST("/signin", todolib.SignIn)
 
-	router.PUT("/upload/:id/:name", todolib.UploadFile)
+	router.PUT("/upload", todolib.UploadFile)
 	router.DELETE("/delete/db/version", todolib.DeleteVersion)
 
 	router.GET("/files", todolib.DownloadFile)
