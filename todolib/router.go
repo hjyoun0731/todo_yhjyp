@@ -21,7 +21,7 @@ func Hello(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	fmt.Fprintf(w, "hello, %s!\n", ps.ByName("name"))
 }
 
-// GetVersion get app inform
+// GetVersion get app newest version information
 func GetVersion(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	a := DbQuery("version", "version")
 	b := DbQuery("name", "version")
@@ -52,7 +52,10 @@ func UploadFile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err != nil {
 		log.Println(err) // 실패 시 로그
 
-		fmt.Fprint(w,r.Header,r.Body) // Request의 Header,Body 그대로 응답
+		//fmt.Fprint(w,r.Header,r.Body) // Request의 Header,Body 그대로 응답
+
+		w.WriteHeader(404)
+		w.Write([]byte(http.StatusText(404)))
 		w.Write([]byte("\nFail."))
 		return
 	}
