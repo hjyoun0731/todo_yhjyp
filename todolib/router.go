@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 // Index main page
@@ -25,7 +24,7 @@ func Hello(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func GetVersion(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	a := DbQuery("version", "version")
 	b := DbQuery("name", "version")
-	c, _ := strconv.Atoi(DbQuery("updateTime", "version"))
+	c := DbQuery("updateTime", "version")
 
 	mem := version{a, b, c}
 
@@ -48,21 +47,18 @@ func InsertVersion(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 // UploadFile ....
 func UploadFile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	r.ParseMultipartForm(0 << 100)
-	file, handler, err := r.FormFile("filename")
+	file, handler, err := r.FormFile("file")
 	if err != nil {
-		log.Println(err) // 실패 시 로그
-
-		//fmt.Fprint(w,r.Header,r.Body) // Request의 Header,Body 그대로 응답
-
 		w.WriteHeader(404)
 		w.Write([]byte(http.StatusText(404)))
-		w.Write([]byte("\nFail."))
+
+		MakeLog("UploadFile Fail.")
 		return
 	}
 	defer file.Close()
 
-	bodyId,bodyDate := r.FormValue("id"),r.FormValue("date")
-	fmt.Println("id : "+bodyId+" date : "+bodyDate)
+	latestVer := version{r.FormValue("version"), r.FormValue("name"), r.FormValue("updateTime") }
+	DbVerInsert(latestVer)
 
 	upFile, err := os.Create("./files/" + handler.Filename)
 	if err != nil {
@@ -89,6 +85,7 @@ func DownloadFile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 
 	w.Header().Add("Content-Type", "multipart/form-data")
 	w.Write(content)
+	MakeLog("DownloadFile success")
 }
 
 func DeleteVersion(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -123,4 +120,22 @@ func SignIn(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		fmt.Fprint(w, "SignIn fail")
 		MakeLog("sign in fail(userid or password is wrong)")
 	}
+}
+
+func GetPath(w http.ResponseWriter, r *http.Request, ps httprouter.Params){
+	var list []string
+	//ver := ps.ByName("version")
+
+	files, err := ioutil.ReadDir("./files")
+	if err != nil {
+		MakeLog("read dir fail")
+		return
+	}
+	for _, filename := range files {
+		list = append(list, filename.Name())
+	}
+
+	log.Println(list)
+
+	MakeLog("download server")
 }

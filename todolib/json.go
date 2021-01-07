@@ -11,7 +11,7 @@ type todoData struct {
 type version struct {
 	Version	string
 	Name	string
-	UpdateTime	int
+	UpdateTime	string
 }
 type account struct {
 	UserId			string
