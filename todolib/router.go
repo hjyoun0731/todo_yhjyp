@@ -5,9 +5,9 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 // Index main page
@@ -124,7 +124,14 @@ func SignIn(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 func GetPath(w http.ResponseWriter, r *http.Request, ps httprouter.Params){
 	var list []string
-	//ver := ps.ByName("version")
+	var dVer string
+
+	ver := ps.ByName("version")
+	if ver == "LTS" {
+		dVer = "LTS.apk"
+	} else {
+		dVer = DbQuery("version","version")+".apk"
+	}
 
 	files, err := ioutil.ReadDir("./files")
 	if err != nil {
@@ -135,7 +142,17 @@ func GetPath(w http.ResponseWriter, r *http.Request, ps httprouter.Params){
 		list = append(list, filename.Name())
 	}
 
-	log.Println(list)
+	for _, f := range list {
+		fVer := strings.Split(f,"_v")
+
+		if len(fVer) < 2{
+			continue
+		}
+
+		if fVer[1] == dVer {
+			fmt.Fprint(w, "http://hjyoun.ddns.net:19124/path/"+f)
+		}
+	}
 
 	MakeLog("download server")
 }

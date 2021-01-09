@@ -25,7 +25,7 @@ func main() {
 	router.DELETE("/delete/db/version", todolib.DeleteVersion)
 
 	//router.GET("/files", todolib.DownloadFile)
-	router.GET("/download", todolib.GetPath)
+	router.GET("/download/:version", todolib.GetPath)
 	router.ServeFiles("/path/*filepath", http.FileSystem(http.Dir("./files")))
 
 	err := http.ListenAndServe(":19124", router)
