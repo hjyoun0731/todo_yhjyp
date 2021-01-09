@@ -11,28 +11,37 @@ import (
 )
 
 // Index main page
-func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprint(w, "Welcome!\n")
+func Index(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
+	_,err := fmt.Fprint(w, "Welcome!\n")
+	if err != nil {
+		MakeLog("router.Index error")
+	}
 }
 
 // Hello hello page
-func Hello(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Fprintf(w, "hello, %s!\n", ps.ByName("name"))
+func Hello(w http.ResponseWriter, _ *http.Request, ps httprouter.Params) {
+	_, err := fmt.Fprintf(w, "hello, %s!\n", ps.ByName("name"))
+	if err != nil {
+		MakeLog("router.hello error")
+	}
 }
 
 // GetVersion get app newest version information
-func GetVersion(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func GetVersion(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 	a := DbQuery("version", "version")
 	b := DbQuery("name", "version")
 	c := DbQuery("updateTime", "version")
 
 	mem := version{a, b, c}
 
-	fmt.Fprintln(w, JSONEnc(mem))
+	_,err := fmt.Fprintln(w, JSONEnc(mem))
+	if err != nil {
+		MakeLog("GetVersion write error")
+	}
 	MakeLog("GetVersion success")
 }
 
-func InsertVersion(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func InsertVersion(_ http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1024))
 	if err != nil {
 		panic(err)
@@ -45,12 +54,15 @@ func InsertVersion(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 }
 
 // UploadFile ....
-func UploadFile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	r.ParseMultipartForm(0 << 100)
+func UploadFile(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	err := r.ParseMultipartForm(0 << 100)
+	if err != nil {
+		MakeLog("UploadFile ParseMultipartForm fail")
+	}
 	file, handler, err := r.FormFile("file")
 	if err != nil {
 		w.WriteHeader(404)
-		w.Write([]byte(http.StatusText(404)))
+		//w.Write([]byte(http.StatusText(404)))
 
 		MakeLog("UploadFile Fail.")
 		return
@@ -69,32 +81,20 @@ func UploadFile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	upFile.Write(fileBytes)
+	_,err = upFile.Write(fileBytes)
+	if err != nil {
+		MakeLog("UploadFile fileBytes write fail")
+	}
 	MakeLog("UploadFile success")
 }
 
-func DownloadFile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	path := "./files/가르쳐줘 코딩 소녀.apk"
-
-	content, err := ioutil.ReadFile(path)
-	if err != nil {
-		w.WriteHeader(404)
-		w.Write([]byte(http.StatusText(404)))
-		panic(err)
-	}
-
-	w.Header().Add("Content-Type", "multipart/form-data")
-	w.Write(content)
-	MakeLog("DownloadFile success")
-}
-
-func DeleteVersion(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func DeleteVersion(_ http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 	a := DbQuery("version", "version")
 	DbDelete(a)
 	MakeLog("DeleteVersion success")
 }
 
-func SignUp(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func SignUp(_ http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	id,pw,check := r.FormValue("id"),r.FormValue("password"),r.FormValue("check")
 
 	dup := DbQuery("userid", "account")
@@ -112,17 +112,23 @@ func SignUp(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 }
 
-func SignIn(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func SignIn(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	if DbQuery("userid", "account") == r.FormValue("id") && DbQuery("password", "account") == r.FormValue("password") {
-		fmt.Fprint(w, "SignIn OK")
+		_,err := fmt.Fprint(w, "SignIn OK")
+		if err != nil {
+			panic(err)
+		}
 		MakeLog("sign in success")
 	} else {
-		fmt.Fprint(w, "SignIn fail")
+		_,err := fmt.Fprint(w, "SignIn fail")
+		if err != nil {
+			panic(err)
+		}
 		MakeLog("sign in fail(userid or password is wrong)")
 	}
 }
 
-func GetPath(w http.ResponseWriter, r *http.Request, ps httprouter.Params){
+func GetPath(w http.ResponseWriter, _ *http.Request, ps httprouter.Params){
 	var list []string
 	var dVer string
 
@@ -150,7 +156,10 @@ func GetPath(w http.ResponseWriter, r *http.Request, ps httprouter.Params){
 		}
 
 		if fVer[1] == dVer {
-			fmt.Fprint(w, "http://hjyoun.ddns.net:19124/path/"+f)
+			_,err := fmt.Fprint(w, "http://hjyoun.ddns.net:19124/path/"+f)
+			if err != nil {
+				MakeLog("GetPath write path fail")
+			}
 		}
 	}
 

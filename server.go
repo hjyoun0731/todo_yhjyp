@@ -24,7 +24,6 @@ func main() {
 	router.PUT("/upload", todolib.UploadFile)
 	router.DELETE("/delete/db/version", todolib.DeleteVersion)
 
-	//router.GET("/files", todolib.DownloadFile)
 	router.GET("/download/:version", todolib.GetPath)
 	router.ServeFiles("/path/*filepath", http.FileSystem(http.Dir("./files")))
 
