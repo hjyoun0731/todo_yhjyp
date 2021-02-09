@@ -79,6 +79,7 @@ func DbQuery(col string,table string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
+	MakeLog("DbQuery success")
 	return getData
 }
 
